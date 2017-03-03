@@ -1,0 +1,6 @@
+#ignoring trash files.
+.classpath
+.project
+.settings/
+bin/
+.*class
