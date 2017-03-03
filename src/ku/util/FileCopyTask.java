@@ -26,7 +26,7 @@ import stopwatch.TaskTimer;
  * file on the classpath of this project. The classpath includes files in your
  * project's src/ directory. It is a standard technique for opening resources.
  * 
- * @author
+ * @author Thitiwat Thongbor
  *
  */
 public class FileCopyTask implements Runnable {
@@ -90,8 +90,10 @@ public class FileCopyTask implements Runnable {
 		// If 'in' is null then throw a RuntimeException
 		// so the caller will know that filename could not be opened.
 
-		// TODO If in (InputStream) is null, throw a RuntimeException with a
-		// message.
+		// If in (InputStream) is null, throw a RuntimeException with a message.
+		if(in==null){
+			throw new RuntimeException("coun't open file");
+		}
 	}
 
 	/**
@@ -136,101 +138,35 @@ public class FileCopyTask implements Runnable {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+		//file name.
 		final String inputFilename = "Big-Alice-in-Wonderland.txt";
+		
+		//output file name.
+		String[] taskOutput = new String[5];
+		for (int i = 0; i < taskOutput.length; i++) {
+			taskOutput[i] = String.format("/tmp/filecopy%d.txt", i + 1);
+		}
 
-		// Define a FileUtil task to copy a file byte by byte.
-		// This is an anonymous class that extends FileUtilTimer.
-		// TODO Can you make this code shorter by passing the filenames
-		// as parameters to the superclass constructor?
-		FileCopyTask task1 = new FileCopyTask() {
-			public void run() {
-				FileUtil.copy(in, out);
-			}
-
-			public String toString() {
-				return "Copy a file one byte at a time\n";
-			}
-		};
-		task1.setInput(inputFilename);
-		task1.setOutput("/tmp/filecopy1.txt");
+		/**
+		 * byte of speed testing.
+		 */
+		final int KiloByte = 1024;
+		final int FourKiloByte = 4 * KiloByte;
+		final int SixtyFourKiloByte = 64 * KiloByte;
 
 		TaskTimer timer = new TaskTimer();
-		timer.measureAndPrint(task1); // wasn't that easy?
 
-		final int test1 = 1024;
-		final int test2 = 4 * 1024;
-		final int test3 = 64 * 1024;
+		Runnable[] tasks = { new ByteCopyTask(inputFilename, taskOutput[0]),
+				new ByteBlockCopyTask(KiloByte, inputFilename, taskOutput[1]),
+				new ByteBlockCopyTask(FourKiloByte, inputFilename, taskOutput[2]),
+				new ByteBlockCopyTask(SixtyFourKiloByte, inputFilename, taskOutput[3]),
+				new BufferedCopyTask(inputFilename, taskOutput[4]) };
 
-		FileCopyTask task2 = new FileCopyTask() {
-			public void run() {
-				FileUtil.copy(in, out, test1);
-			}
-
-			public String toString() {
-				return "Copy a file using a byte array of size 1KB\n";
-			}
-		};
-		task2.setInput(inputFilename);
-		task2.setOutput("/tmp/filecopy2.txt");
-		timer.measureAndPrint(task2);
-
-		FileCopyTask task3 = new FileCopyTask() {
-			public void run() {
-				FileUtil.copy(in, out, test2);
-			}
-
-			public String toString() {
-				return "Copy a file using a byte array of size 4*1024KB\n";
-			}
-		};
-		task3.setInput(inputFilename);
-		task3.setOutput("/tmp/filecopy3.txt");
-		timer.measureAndPrint(task3);
-
-		FileCopyTask task4 = new FileCopyTask() {
-			public void run() {
-				FileUtil.copy(in, out, test3);
-			}
-
-			public String toString() {
-				return "Copy a file using a byte array of size 64*1024KB\n";
-			}
-		};
-		task4.setInput(inputFilename);
-		task4.setOutput("/tmp/filecopy4.txt");
-		timer.measureAndPrint(task4);
-
-		FileCopyTask task5 = new FileCopyTask() {
-			public void run() {
-				FileUtil.bcopy(in, out);
-			}
-
-			public String toString() {
-				return "Copy a file using BufferedReader\n";
-			}
-		};
-		task5.setInput(inputFilename);
-		task5.setOutput("/tmp/filecopy5.txt");
-		timer.measureAndPrint(task5);
-
-		// for the copy method. Don't write this as a number in the
-		// anonymous class! Use a variable from the outer scope (here).
+		//run all the tasks.
+		for (Runnable task : tasks) {
+			timer.measureAndPrint(task);
+		}
 	}
-
-	// class task implements Runnable {
-	// int data;
-	// String type;
-	//
-	// task(String type, int data) {
-	// this.type = type;
-	// this.data = data;
-	// }
-	//
-	// @Override
-	// public void run() {
-	// if(type)
-	// FileUtil.copy(in, out);
-	// }
-	// }
 
 }

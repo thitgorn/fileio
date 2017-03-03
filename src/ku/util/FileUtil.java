@@ -42,7 +42,7 @@ public class FileUtil {
 		String buffer;
 		try {
 			while (!((buffer = input.readLine()) == null)) {
-				writer.write(buffer);
+				writer.println(buffer);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException();
