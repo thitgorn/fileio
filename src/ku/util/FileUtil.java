@@ -8,16 +8,26 @@ public class FileUtil {
 	static void copy(InputStream in, OutputStream out) {
 		try {
 			int copyOfIn;
-			while ((copyOfIn = in.read()) < 0) {
+			while ((copyOfIn = in.read()) >= 0) {
 				out.write(copyOfIn);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException();
 		}
+		
 	}
 
 	static void copy(InputStream in, OutputStream out, int blokcsize) {
+		try {
+			int blocksize = blokcsize;
+			byte[] buffer = new byte[blocksize];
+			int count;
+			while ((count = in.read(buffer)) >= 0) {
+				out.write(buffer, count, blocksize);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException();
+		}
 
 	}
 
