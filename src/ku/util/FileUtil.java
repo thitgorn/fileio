@@ -8,7 +8,22 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 
+/**
+ * Utility class for helping copy task.
+ * 
+ * @author Thitiwat Thongbor
+ *
+ */
 public class FileUtil {
+
+	/**
+	 * copy byte by byte from a file to file.
+	 * 
+	 * @param in
+	 *            InputStream
+	 * @param out
+	 *            OutputStream
+	 */
 	static void copy(InputStream in, OutputStream out) {
 		try {
 			int copyOfIn;
@@ -18,9 +33,19 @@ public class FileUtil {
 		} catch (IOException e) {
 			throw new RuntimeException();
 		}
-
+		closeInAndOut(in, out);
 	}
 
+	/**
+	 * copy the file by defining byte per round from a file to file.
+	 * 
+	 * @param in
+	 *            InputStream
+	 * @param out
+	 *            OutputStream
+	 * @param blokcsize
+	 *            byte per round
+	 */
 	static void copy(InputStream in, OutputStream out, int blokcsize) {
 		try {
 			int blocksize = blokcsize;
@@ -32,9 +57,17 @@ public class FileUtil {
 		} catch (IOException e) {
 			throw new RuntimeException();
 		}
-
+		closeInAndOut(in, out);
 	}
 
+	/**
+	 * copy using Buffer Reader , this copies by line from a file to file.
+	 * 
+	 * @param in
+	 *            InputStream
+	 * @param out
+	 *            OutputStreams
+	 */
 	static void bcopy(InputStream in, OutputStream out) {
 		Reader reader = new InputStreamReader(in);
 		BufferedReader input = new BufferedReader(reader);
@@ -44,6 +77,24 @@ public class FileUtil {
 			while (!((buffer = input.readLine()) == null)) {
 				writer.println(buffer);
 			}
+		} catch (IOException e) {
+			throw new RuntimeException();
+		}
+		try {
+			input.close();
+		} catch (IOException e) {
+			throw new RuntimeException();
+		}
+		closeInAndOut(in, out);
+	}
+
+	/**
+	 * close the input and output stream. just for avoiding duplicate code.
+	 */
+	private static void closeInAndOut(InputStream in, OutputStream out) {
+		try {
+			in.close();
+			out.close();
 		} catch (IOException e) {
 			throw new RuntimeException();
 		}
